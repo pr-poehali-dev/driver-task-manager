@@ -27,7 +27,7 @@ interface Task {
 }
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("tasks");
+  const [activeTab, setActiveTab] = useState("in_progress");
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: "1",
@@ -139,13 +139,15 @@ const Index = () => {
   };
 
   const navItems = [
-    { id: "tasks", label: "Задания", icon: "Truck" },
-    { id: "drivers", label: "Водители", icon: "Users" },
-    { id: "organizations", label: "Организации", icon: "Building2" },
-    { id: "routes", label: "Маршруты", icon: "Map" },
-    { id: "reports", label: "Отчёты", icon: "BarChart3" },
-    { id: "settings", label: "Настройки", icon: "Settings" },
+    { id: "in_progress", label: "Задания в работе", icon: "Truck", status: "in_progress" as TaskStatus },
+    { id: "completed", label: "Задания завершены", icon: "CheckCircle2", status: "completed" as TaskStatus },
+    { id: "pending", label: "Задания плановые", icon: "Calendar", status: "pending" as TaskStatus },
   ];
+
+  const filteredTasks = tasks.filter((task) => {
+    const currentNav = navItems.find((item) => item.id === activeTab);
+    return currentNav ? task.status === currentNav.status : true;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -292,14 +294,21 @@ const Index = () => {
       </nav>
 
       <main className="container mx-auto px-4 py-6">
-        {activeTab === "tasks" && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Активные задания ({tasks.length})</h2>
-            </div>
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">
+              {navItems.find((item) => item.id === activeTab)?.label} ({filteredTasks.length})
+            </h2>
+          </div>
 
+          {filteredTasks.length === 0 ? (
+            <div className="text-center py-12">
+              <Icon name="Inbox" size={48} className="mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium text-muted-foreground">Заданий пока нет</h3>
+            </div>
+          ) : (
             <div className="grid gap-4">
-              {tasks.map((task) => (
+              {filteredTasks.map((task) => (
                 <Card key={task.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -398,17 +407,8 @@ const Index = () => {
                 </Card>
               ))}
             </div>
-          </div>
-        )}
-
-        {activeTab !== "tasks" && (
-          <div className="text-center py-12 animate-fade-in">
-            <Icon name="Construction" size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-muted-foreground">
-              Раздел "{navItems.find((item) => item.id === activeTab)?.label}" в разработке
-            </h3>
-          </div>
-        )}
+          )}
+        </div>
       </main>
     </div>
   );
