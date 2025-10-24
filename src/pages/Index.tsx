@@ -23,6 +23,9 @@ interface Task {
   contacts: string;
   additionalInfo: string;
   status: TaskStatus;
+  taskDate: string;
+  startTime: string;
+  endTime: string;
   createdAt: Date;
 }
 
@@ -41,6 +44,9 @@ const Index = () => {
       contacts: "+7 (495) 123-45-67",
       additionalInfo: "Требуется разгрузка краном",
       status: "pending",
+      taskDate: "2025-10-25",
+      startTime: "09:00",
+      endTime: "12:00",
       createdAt: new Date(),
     },
     {
@@ -55,6 +61,9 @@ const Index = () => {
       contacts: "+7 (495) 987-65-43",
       additionalInfo: "Хрупкий груз, осторожная погрузка",
       status: "in_progress",
+      taskDate: "2025-10-24",
+      startTime: "10:00",
+      endTime: "14:00",
       createdAt: new Date(),
     },
   ]);
@@ -69,16 +78,19 @@ const Index = () => {
     schedule: "",
     contacts: "",
     additionalInfo: "",
+    taskDate: "",
+    startTime: "",
+    endTime: "",
     status: "pending",
   });
 
   const { toast } = useToast();
 
   const handleCreateTask = () => {
-    if (!newTask.cargo || !newTask.organization || !newTask.address) {
+    if (!newTask.cargo || !newTask.organization || !newTask.address || !newTask.taskDate) {
       toast({
         title: "Ошибка",
-        description: "Заполните обязательные поля: Груз, Организация, Адрес",
+        description: "Заполните обязательные поля: Груз, Организация, Адрес, Дата задания",
         variant: "destructive",
       });
       return;
@@ -95,6 +107,9 @@ const Index = () => {
       schedule: newTask.schedule || "",
       contacts: newTask.contacts || "",
       additionalInfo: newTask.additionalInfo || "",
+      taskDate: newTask.taskDate || "",
+      startTime: newTask.startTime || "",
+      endTime: newTask.endTime || "",
       status: "pending",
       createdAt: new Date(),
     };
@@ -110,6 +125,9 @@ const Index = () => {
       schedule: "",
       contacts: "",
       additionalInfo: "",
+      taskDate: "",
+      startTime: "",
+      endTime: "",
       status: "pending",
     });
 
@@ -253,6 +271,37 @@ const Index = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="taskDate">Дата задания *</Label>
+                    <Input
+                      id="taskDate"
+                      type="date"
+                      value={newTask.taskDate}
+                      onChange={(e) => setNewTask({ ...newTask, taskDate: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="startTime">Время начала</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={newTask.startTime}
+                        onChange={(e) => setNewTask({ ...newTask, startTime: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="endTime">Время окончания</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={newTask.endTime}
+                        onChange={(e) => setNewTask({ ...newTask, endTime: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="additionalInfo">Дополнительная информация</Label>
                     <Textarea
                       id="additionalInfo"
@@ -323,6 +372,40 @@ const Index = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
+                    <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="flex items-center gap-2">
+                          <Icon name="CalendarDays" size={16} className="text-primary" />
+                          <div className="text-sm">
+                            <div className="text-muted-foreground text-xs">Дата задания</div>
+                            <div className="font-semibold text-foreground">
+                              {task.taskDate
+                                ? new Date(task.taskDate).toLocaleDateString("ru-RU", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                : "Не указана"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Icon name="Clock" size={16} className="text-accent" />
+                          <div className="text-sm">
+                            <div className="text-muted-foreground text-xs">Время начала</div>
+                            <div className="font-semibold text-foreground">{task.startTime || "Не указано"}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Icon name="Clock" size={16} className="text-destructive" />
+                          <div className="text-sm">
+                            <div className="text-muted-foreground text-xs">Время окончания</div>
+                            <div className="font-semibold text-foreground">{task.endTime || "Не указано"}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <div className="flex items-start gap-2">
